@@ -1,0 +1,2764 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>5.0</version>
+    <date>2022-06-17T01:44:11Z</date>
+    <groups>
+        <group>
+            <name>Templates/HEAA</name>
+        </group>
+        <group>
+            <name>Templates/Printers</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Template SNMP Impressora MPS5501b - HEAA</template>
+            <name>Template SNMP Impressora MPS5501b - HEAA</name>
+            <description>Template para impressoras OKI &#13;
+Modelo MPS5501b&#13;
+&#13;
+#- - - - - - Recursos&#13;
+- Coleta de dados de Suprimentos, Toner, Unidade de imagem, Fusor&#13;
+- Disponibilidade&#13;
+- Coleta de Dados de impressões diárias, semanais e mensais&#13;
+- Coleta de Dados de quantidade de Folhas na bandeja&#13;
+- Colega de Dados de Conectividades  de rede&#13;
+&#13;
+Michael Martins - 2022</description>
+            <groups>
+                <group>
+                    <name>Templates/HEAA</name>
+                </group>
+                <group>
+                    <name>Templates/Printers</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>Informacoes de Disponibilidade do Equipamento</name>
+                </application>
+                <application>
+                    <name>Informacoes de Paginas Impressas</name>
+                </application>
+                <application>
+                    <name>Informacoes de Paginas Impressas mes</name>
+                </application>
+                <application>
+                    <name>Informacoes de Paginas Impressas por dia</name>
+                </application>
+                <application>
+                    <name>Informacoes de Paginas Impressas Por Semana</name>
+                </application>
+                <application>
+                    <name>Informações de Custo de Impressão</name>
+                </application>
+                <application>
+                    <name>Informações de Rede</name>
+                </application>
+                <application>
+                    <name>Informações de Status da Impressora</name>
+                </application>
+                <application>
+                    <name>Informações do Cilindro de Imagem</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>Contador de Paginas Impressas Por Dia</name>
+                    <type>CALCULATED</type>
+                    <key>contador_impressoes_dia</key>
+                    <delay>0;h00m02</delay>
+                    <history>365d</history>
+                    <trends>90d</trends>
+                    <units>Paginas</units>
+                    <params>last(&quot;prtMarkerLifeCount.1.1&quot;)</params>
+                    <description>Coleta agendada as 00:02hs todos os dias.</description>
+                    <applications>
+                        <application>
+                            <name>Informacoes de Paginas Impressas por dia</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Contador de Paginas Impressas Por Mes</name>
+                    <type>CALCULATED</type>
+                    <key>contador_impressoes_mes</key>
+                    <delay>0;md1h00m04</delay>
+                    <history>365d</history>
+                    <trends>90d</trends>
+                    <units>Paginas</units>
+                    <params>last(&quot;prtMarkerLifeCount.1.1&quot;)</params>
+                    <description>Coleta agendada as 00:04hs todo dia 1º de cada mês, conta o total das páginas impressas desde a última coleta total do mês.</description>
+                    <applications>
+                        <application>
+                            <name>Informacoes de Paginas Impressas mes</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Contador de Paginas Impressas Por Semana</name>
+                    <type>CALCULATED</type>
+                    <key>contador_impressoes_semana</key>
+                    <delay>0;wd1h00m03</delay>
+                    <history>365d</history>
+                    <trends>90d</trends>
+                    <units>Paginas</units>
+                    <params>last(&quot;prtMarkerLifeCount.1.1&quot;)</params>
+                    <description>Coleta agendada as 00:03hs toda segunda feira de cada semana, conta o total das páginas impressas desde a última coleta total da semana.</description>
+                    <applications>
+                        <application>
+                            <name>Informacoes de Paginas Impressas Por Semana</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Ping</name>
+                    <type>SIMPLE</type>
+                    <key>icmpping</key>
+                    <delay>30s</delay>
+                    <history>7d</history>
+                    <applications>
+                        <application>
+                            <name>Informacoes de Disponibilidade do Equipamento</name>
+                        </application>
+                    </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{max(#3)}=0</expression>
+                            <name>A {HOST.NAME} está Offline</name>
+                            <priority>HIGH</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>Perda de Pacote ( Porcentagem)</name>
+                    <type>SIMPLE</type>
+                    <key>icmppingloss</key>
+                    <delay>60</delay>
+                    <history>7d</history>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <applications>
+                        <application>
+                            <name>Informacoes de Disponibilidade do Equipamento</name>
+                        </application>
+                    </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{min(5m)}&gt;50</expression>
+                            <name>A perda de pacotes (ICMP) está muito alta na {HOST.NAME}</name>
+                            <priority>WARNING</priority>
+                            <dependencies>
+                                <dependency>
+                                    <name>A {HOST.NAME} está Offline</name>
+                                    <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                </dependency>
+                            </dependencies>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>Ping por Segundo</name>
+                    <type>SIMPLE</type>
+                    <key>icmppingsec</key>
+                    <delay>60</delay>
+                    <history>60d</history>
+                    <trends>90d</trends>
+                    <value_type>FLOAT</value_type>
+                    <units>s</units>
+                    <applications>
+                        <application>
+                            <name>Informacoes de Disponibilidade do Equipamento</name>
+                        </application>
+                    </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{avg(5m)}&gt;30</expression>
+                            <name>O tempo de resposta está muito alto na {HOST.NAME}</name>
+                            <priority>WARNING</priority>
+                            <dependencies>
+                                <dependency>
+                                    <name>A {HOST.NAME} está Offline</name>
+                                    <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                </dependency>
+                            </dependencies>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>Paginas Impressas Por Dia</name>
+                    <type>CALCULATED</type>
+                    <key>impressoes_dia</key>
+                    <delay>600</delay>
+                    <history>365d</history>
+                    <trends>90d</trends>
+                    <units>Paginas</units>
+                    <params>last(&quot;prtMarkerLifeCount.1.1&quot;)-last(&quot;contador_impressoes_dia&quot;)</params>
+                    <applications>
+                        <application>
+                            <name>Informacoes de Paginas Impressas por dia</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Paginas Impressas Por Mes</name>
+                    <type>CALCULATED</type>
+                    <key>impressoes_mes</key>
+                    <delay>600</delay>
+                    <history>365d</history>
+                    <trends>90d</trends>
+                    <units>Paginas</units>
+                    <params>last(&quot;prtMarkerLifeCount.1.1&quot;)-last(&quot;contador_impressoes_mes&quot;)</params>
+                    <description>Coleta o total de impressões no mês.</description>
+                    <applications>
+                        <application>
+                            <name>Informacoes de Paginas Impressas mes</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Paginas Impressas Por Semana</name>
+                    <type>CALCULATED</type>
+                    <key>impressoes_semana</key>
+                    <delay>600</delay>
+                    <history>365d</history>
+                    <trends>90d</trends>
+                    <units>Paginas</units>
+                    <params>last(&quot;prtMarkerLifeCount.1.1&quot;)-last(&quot;contador_impressoes_semana&quot;)</params>
+                    <description>Coleta o total de impressões esta semana.</description>
+                    <applications>
+                        <application>
+                            <name>Informacoes de Paginas Impressas Por Semana</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Capacidade Atual do Cilindro de Imagem</name>
+                    <type>CALCULATED</type>
+                    <key>oki.drum.counter.max.calculated</key>
+                    <params>(last(oki.drum.counter.max.level)-last(oki.drum.counter.max.current))/last(oki.drum.counter.max.level) * 100</params>
+                    <applications>
+                        <application>
+                            <name>Informações do Cilindro de Imagem</name>
+                        </application>
+                    </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{last()}&lt;=1</expression>
+                            <name>Troca Necessária do Cilindro de imagem -  {ITEM.VALUE} %</name>
+                            <priority>HIGH</priority>
+                            <manual_close>YES</manual_close>
+                            <dependencies>
+                                <dependency>
+                                    <name>Vida Útil do Cilindro de imagem abaixo de  {ITEM.VALUE} %</name>
+                                    <expression>{Template SNMP Impressora MPS5501b - HEAA:oki.drum.counter.max.calculated.last()}&lt;5</expression>
+                                </dependency>
+                            </dependencies>
+                        </trigger>
+                        <trigger>
+                            <expression>{last()}=100</expression>
+                            <name>Um novo Cilindro de imagem foi instalado {HOST.NAME}</name>
+                            <priority>INFO</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                        <trigger>
+                            <expression>{last()}&lt;5</expression>
+                            <name>Vida Útil do Cilindro de imagem abaixo de  {ITEM.VALUE} %</name>
+                            <priority>WARNING</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>Capacidade Atual do Cilindro de Imagem em %</name>
+                    <type>CALCULATED</type>
+                    <key>oki.drum.counter.max.calculated.percent</key>
+                    <units>%</units>
+                    <params>(last(oki.drum.counter.max.level)-last(oki.drum.counter.max.current))/last(oki.drum.counter.max.level) * 100</params>
+                    <applications>
+                        <application>
+                            <name>Informações do Cilindro de Imagem</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Uso Atual do Cilindro de Imagem</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>.1.3.6.1.4.1.2001.1.1.1.1.100.4.1.1.3.1</snmp_oid>
+                    <key>oki.drum.counter.max.current</key>
+                    <applications>
+                        <application>
+                            <name>Informações do Cilindro de Imagem</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Capacidade máxima do Cilindro de Imagem</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>.1.3.6.1.4.1.2001.1.1.1.1.100.4.1.1.4.1</snmp_oid>
+                    <key>oki.drum.counter.max.level</key>
+                    <applications>
+                        <application>
+                            <name>Informações do Cilindro de Imagem</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Status da Impressora</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>1.3.6.1.4.1.2001.1.1.1.1.2.20.0</snmp_oid>
+                    <key>printer.system.info.status</key>
+                    <history>7d</history>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <applications>
+                        <application>
+                            <name>Informações de Status da Impressora</name>
+                        </application>
+                    </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{str(COVER OPEN,1m)}=1</expression>
+                            <name>A Tampa da impressora Está aberta, Mensagem &gt; {ITEM.VALUE}</name>
+                            <priority>INFO</priority>
+                            <description>The indicated cover is open. Close the cover.&#13;
+310: Outlet tray (Top cover); 311: Front cover</description>
+                        </trigger>
+                        <trigger>
+                            <expression>{str(391:Paper Jam,1m)}=1</expression>
+                            <name>Atolamento de Papel, Mensagem &gt; {ITEM.VALUE}</name>
+                            <status>DISABLED</status>
+                            <priority>AVERAGE</priority>
+                            <description>A paper jam has occurred in the paper feed path from the indicated tray.&#13;
+&#13;
+Remove the jammed paper.&#13;
+&#13;
+If paper is not jammed, feeding paper may fail.&#13;
+&#13;
+Reduce the number of sheets of paper loaded on the paper cassette. Make sure that the paper stoppers are set in the right position.</description>
+                        </trigger>
+                        <trigger>
+                            <expression>{str(391:Paper Jam/Tray1,1m)}=1</expression>
+                            <name>Atolamento de Papel, Mensagem &gt; {ITEM.VALUE}</name>
+                            <priority>AVERAGE</priority>
+                            <description>A paper jam has occurred in the paper feed path from the indicated tray.&#13;
+&#13;
+Remove the jammed paper.&#13;
+&#13;
+If paper is not jammed, feeding paper may fail.&#13;
+&#13;
+Reduce the number of sheets of paper loaded on the paper cassette. Make sure that the paper stoppers are set in the right position.</description>
+                        </trigger>
+                        <trigger>
+                            <expression>{str(OFFLINE/391:PAPER JAM,1m)}=1</expression>
+                            <name>Atolamento de Papel, Mensagem &gt; {ITEM.VALUE}</name>
+                            <status>DISABLED</status>
+                            <priority>AVERAGE</priority>
+                            <description>A paper jam has occurred in the paper feed path from the indicated tray.&#13;
+&#13;
+Remove the jammed paper.&#13;
+&#13;
+If paper is not jammed, feeding paper may fail.&#13;
+&#13;
+Reduce the number of sheets of paper loaded on the paper cassette. Make sure that the paper stoppers are set in the right position.</description>
+                        </trigger>
+                        <trigger>
+                            <expression>{str(413:Toner Empty,1m)}=1</expression>
+                            <name>O Toner está vazio, Mensagem &gt; {ITEM.VALUE}</name>
+                            <priority>AVERAGE</priority>
+                            <description>The toner cartridge of the displayed color is Empty</description>
+                        </trigger>
+                        <trigger>
+                            <expression>{str(613:TONER MISSING,1m)}=1</expression>
+                            <name>O Toner não está Instalado, Mensagem &gt; {ITEM.VALUE}</name>
+                            <priority>HIGH</priority>
+                            <description>The toner cartridge of the displayed color is not installed.&#13;
+Install the toner cartridge. To install the toner cartridge, see &quot;Replacing the black(K) toner cartridge and the waste toner box&quot; or &quot;Replacing the toner cartridge (C/M/Y)&quot;.&#13;
+610: Yellow; 611: Magenta; 612: Cyan; 613: Black</description>
+                        </trigger>
+                        <trigger>
+                            <expression>{str(173:Error,1m)}=1</expression>
+                            <name>Service Call Required, Mensagem &gt; {ITEM.VALUE}</name>
+                            <priority>HIGH</priority>
+                            <description>The toner cartridge of the displayed color is not installed.&#13;
+Install the toner cartridge. To install the toner cartridge, see &quot;Replacing the black(K) toner cartridge and the waste toner box&quot; or &quot;Replacing the toner cartridge (C/M/Y)&quot;.&#13;
+610: Yellow; 611: Magenta; 612: Cyan; 613: Black</description>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>Custo de Impressões por dia</name>
+                    <type>CALCULATED</type>
+                    <key>printers.cost.day</key>
+                    <history>365d</history>
+                    <value_type>FLOAT</value_type>
+                    <units>R$</units>
+                    <params>last(&quot;impressoes_dia&quot;)*{$CUSTO.FOLHA}</params>
+                    <description>Custo da impressão diária considerando o custo de cada impressão no valor de {$CUSTO.FOLHA}</description>
+                    <applications>
+                        <application>
+                            <name>Informações de Custo de Impressão</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Custo de Impressões por dia - Total</name>
+                    <type>CALCULATED</type>
+                    <key>printers.cost.day.total</key>
+                    <history>365d</history>
+                    <value_type>FLOAT</value_type>
+                    <units>R$</units>
+                    <params>last(&quot;impressoes_dia&quot;)*{$CUSTO.FOLHA} +&#13;
+last(&quot;impressoes_dia&quot;)*{$CUSTO.FOLHA.UNIVERSODIGI}</params>
+                    <description>Custo da impressão diária considerando o custo de folha, mais o valor pago à Empresa Universo Digital</description>
+                    <applications>
+                        <application>
+                            <name>Informações de Custo de Impressão</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Custo de Impressões por dia - Universo Digital</name>
+                    <type>CALCULATED</type>
+                    <key>printers.cost.day.universodig</key>
+                    <history>365d</history>
+                    <value_type>FLOAT</value_type>
+                    <units>R$</units>
+                    <params>last(&quot;impressoes_dia&quot;)*{$CUSTO.FOLHA.UNIVERSODIGI}</params>
+                    <description>Custo da impressão diária considerando o custo de cada impressão Pago à Empresa Universo Digital</description>
+                    <applications>
+                        <application>
+                            <name>Informações de Custo de Impressão</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Custo de Impressões por mês</name>
+                    <type>CALCULATED</type>
+                    <key>printers.cost.month</key>
+                    <history>365d</history>
+                    <value_type>FLOAT</value_type>
+                    <units>R$</units>
+                    <params>last(&quot;impressoes_mes&quot;)*{$CUSTO.FOLHA}</params>
+                    <description>Custo de Impressões por Mês.</description>
+                    <applications>
+                        <application>
+                            <name>Informações de Custo de Impressão</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Custo de Impressões por mês - Total</name>
+                    <type>CALCULATED</type>
+                    <key>printers.cost.month.total</key>
+                    <history>365d</history>
+                    <value_type>FLOAT</value_type>
+                    <units>R$</units>
+                    <params>last(&quot;impressoes_mes&quot;)*{$CUSTO.FOLHA} +&#13;
+last(&quot;impressoes_mes&quot;)*{$CUSTO.FOLHA.UNIVERSODIGI}</params>
+                    <description>Custo de Impressões por Mês considerando o custo por folha, mais o valor pago à empresa Universo Digital</description>
+                    <applications>
+                        <application>
+                            <name>Informações de Custo de Impressão</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Custo de Impressões por mês - Universo Digital</name>
+                    <type>CALCULATED</type>
+                    <key>printers.cost.month.universodig</key>
+                    <history>365d</history>
+                    <value_type>FLOAT</value_type>
+                    <units>R$</units>
+                    <params>last(&quot;impressoes_mes&quot;)*{$CUSTO.FOLHA.UNIVERSODIGI}</params>
+                    <description>Custo de Impressões por Mês Pago à empresa Universo Digital</description>
+                    <applications>
+                        <application>
+                            <name>Informações de Custo de Impressão</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Custo de Impressões por Semana</name>
+                    <type>CALCULATED</type>
+                    <key>printers.cost.week</key>
+                    <history>365d</history>
+                    <value_type>FLOAT</value_type>
+                    <units>R$</units>
+                    <params>last(&quot;impressoes_semana&quot;)*{$CUSTO.FOLHA}</params>
+                    <description>Custo de Impressões por Semana.</description>
+                    <applications>
+                        <application>
+                            <name>Informações de Custo de Impressão</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Custo de Impressões por Semana - Total</name>
+                    <type>CALCULATED</type>
+                    <key>printers.cost.week.total</key>
+                    <history>365d</history>
+                    <value_type>FLOAT</value_type>
+                    <units>R$</units>
+                    <params>last(&quot;impressoes_semana&quot;)*{$CUSTO.FOLHA} +&#13;
+last(&quot;impressoes_semana&quot;)*{$CUSTO.FOLHA.UNIVERSODIGI}</params>
+                    <description>Custo de Impressões por Semana considerando o custo de folhas, mais o valor pago à empresa Universo Digital.</description>
+                    <applications>
+                        <application>
+                            <name>Informações de Custo de Impressão</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Custo de Impressões por Semana - Universo  Digital</name>
+                    <type>CALCULATED</type>
+                    <key>printers.cost.week.universodig</key>
+                    <value_type>FLOAT</value_type>
+                    <units>R$</units>
+                    <params>last(&quot;impressoes_semana&quot;)*{$CUSTO.FOLHA.UNIVERSODIGI}</params>
+                    <description>Custo de Impressões por Semana pago à empresa Universo Digital</description>
+                    <applications>
+                        <application>
+                            <name>Informações de Custo de Impressão</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Pacotes Usados por Mês</name>
+                    <type>CALCULATED</type>
+                    <key>printers.ream.month</key>
+                    <history>365d</history>
+                    <units>Pacotes</units>
+                    <params>last(&quot;impressoes_mes&quot;)/500</params>
+                    <description>Pacotes de 500 Folhas usados por mês</description>
+                    <applications>
+                        <application>
+                            <name>Informações de Custo de Impressão</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Endereço IP</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>1.3.6.1.4.1.11.2.4.3.5.2.0</snmp_oid>
+                    <key>printers.system.network.ipaddress</key>
+                    <delay>1h</delay>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <applications>
+                        <application>
+                            <name>Informações de Rede</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Mac Adrress</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>1.3.6.1.2.1.2.2.1.6.1</snmp_oid>
+                    <key>printers.system.network.macaddress</key>
+                    <delay>1h</delay>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <applications>
+                        <application>
+                            <name>Informações de Rede</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Paginas Impressas Total</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>1.3.6.1.4.1.2001.1.1.1.1.100.1.1.1.3.1</snmp_oid>
+                    <key>prtMarkerLifeCount.1.1</key>
+                    <delay>600</delay>
+                    <history>365d</history>
+                    <trends>90d</trends>
+                    <units>Paginas</units>
+                    <applications>
+                        <application>
+                            <name>Informacoes de Paginas Impressas</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Tempo Ligado do Equipamento</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>.1.3.6.1.2.1.1.3.0</snmp_oid>
+                    <key>sysUpTimeInstance</key>
+                    <delay>2m</delay>
+                    <history>60d</history>
+                    <trends>90d</trends>
+                    <units>uptime</units>
+                    <applications>
+                        <application>
+                            <name>Informacoes de Disponibilidade do Equipamento</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>MULTIPLIER</type>
+                            <params>0.01</params>
+                        </step>
+                    </preprocessing>
+                    <triggers>
+                        <trigger>
+                            <expression>{last()}&lt;5m</expression>
+                            <name>A {HOST.NAME} foi Reiniciada</name>
+                            <priority>INFO</priority>
+                            <manual_close>YES</manual_close>
+                            <dependencies>
+                                <dependency>
+                                    <name>A {HOST.NAME} está Offline</name>
+                                    <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                </dependency>
+                            </dependencies>
+                        </trigger>
+                    </triggers>
+                </item>
+            </items>
+            <discovery_rules>
+                <discovery_rule>
+                    <name>Descoberta LLD Descricao do Hardware</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.2.1.25.3.2.1.3]</snmp_oid>
+                    <key>hrDeviceDescr</key>
+                    <delay>3600</delay>
+                    <lifetime>1d</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>Descricao do Equipamento</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.25.3.2.1.3.{#SNMPINDEX}</snmp_oid>
+                            <key>hrDeviceDescr[{#SNMPVALUE}]</key>
+                            <delay>900</delay>
+                            <history>60d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Equipamento</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Status de Erro do Dispositivos No Equipamento</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.25.3.2.1.6.{#SNMPINDEX}</snmp_oid>
+                            <key>hrDeviceErrors[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes de Erros no Dispositivo Anexado</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Descricao do Tipo de Dispositivos Equipamento Identificacao</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.25.3.2.1.4.{#SNMPINDEX}</snmp_oid>
+                            <key>hrDeviceID[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes de identificacao do Dispositivo</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Dispositivos Anexados</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.25.3.2.1.1.{#SNMPINDEX}</snmp_oid>
+                            <key>hrDeviceIndex[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes de Dispositivos Anexados</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Status do Dispositivos No Equipamento</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.25.3.2.1.5.{#SNMPINDEX}</snmp_oid>
+                            <key>hrDeviceStatus[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes de Status do Dispositivo Anexado</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Descricao do Tipo de Dispositivos Equipamento</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.25.3.2.1.2.{#SNMPINDEX}</snmp_oid>
+                            <key>hrDeviceType[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes Tipos de Dispositivos Anexados</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>Descoberta LLD Rede</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.2.1.2.2.1.2]</snmp_oid>
+                    <key>ifDescr</key>
+                    <delay>3600</delay>
+                    <lifetime>1d</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>Status administrativo da Inteface $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>IF-MIB::ifAdminStatus.{#SNMPINDEX}</snmp_oid>
+                            <key>ifAdminStatus[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>90d</trends>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes de Status da Placa de Rede</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <valuemap>
+                                <name>SNMP interface status (ifAdminStatus)</name>
+                            </valuemap>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Descricao da Placa de Rede $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>IF-MIB::ifDescr.{#SNMPINDEX}</snmp_oid>
+                            <key>ifDescr[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>7d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes de Rede do Equipamento</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Trafego de Entrada Porta $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>IF-MIB::ifInOctets.{#SNMPINDEX}</snmp_oid>
+                            <key>ifInOctets[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>90d</trends>
+                            <units>bps</units>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes de Trafego de Entrada</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <preprocessing>
+                                <step>
+                                    <type>CHANGE_PER_SECOND</type>
+                                    <params/>
+                                </step>
+                                <step>
+                                    <type>MULTIPLIER</type>
+                                    <params>8</params>
+                                </step>
+                            </preprocessing>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Trafego de Saida Porta $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>IF-MIB::ifOutOctets.{#SNMPINDEX}</snmp_oid>
+                            <key>ifOutOctets[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>90d</trends>
+                            <units>bps</units>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes de Trafego de Saida</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <preprocessing>
+                                <step>
+                                    <type>CHANGE_PER_SECOND</type>
+                                    <params/>
+                                </step>
+                                <step>
+                                    <type>MULTIPLIER</type>
+                                    <params>8</params>
+                                </step>
+                            </preprocessing>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>Descoberta LLD Nivel de Papel MP 1</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.2.1.43.8.2.1.18.1]</snmp_oid>
+                    <key>prtInputDescriptionMp1</key>
+                    <delay>3600</delay>
+                    <filter>
+                        <conditions>
+                            <condition>
+                                <macro>{#SNMPVALUE}</macro>
+                                <value>^MP</value>
+                                <formulaid>A</formulaid>
+                            </condition>
+                        </conditions>
+                    </filter>
+                    <lifetime>1d</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>Nivel de Papel na Bandeja $1 (Porcentagem)</name>
+                            <type>CALCULATED</type>
+                            <key>niveldepapelMP[{#SNMPVALUE}]</key>
+                            <delay>900</delay>
+                            <history>7d</history>
+                            <value_type>FLOAT</value_type>
+                            <units>%</units>
+                            <params>100*last(&quot;prtInputCurrentLevelMP[{#SNMPVALUE}]&quot;)/last(&quot;prtInputMaxCapacityMP[{#SNMPVALUE}]&quot;)</params>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes da Bandeja MP da Impressora</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Nivel de Papel da Bandeja $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.8.2.1.10.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtInputCurrentLevelMP[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>7d</history>
+                            <value_type>FLOAT</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes da Bandeja MP da Impressora</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Descricao da Bandeja MP 1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.8.2.1.18.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtInputDescriptionMP1[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>7d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes da Bandeja MP da Impressora</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Maxima Capacidade da Bandeja $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.8.2.1.9.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtInputMaxCapacityMP[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>7d</history>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes da Bandeja MP da Impressora</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                    <graph_prototypes>
+                        <graph_prototype>
+                            <name>12- Nivel de Papel Na Bandeja {#SNMPVALUE}</name>
+                            <graph_items>
+                                <graph_item>
+                                    <drawtype>FILLED_REGION</drawtype>
+                                    <color>FFFFFF</color>
+                                    <item>
+                                        <host>Template SNMP Impressora MPS5501b - HEAA</host>
+                                        <key>niveldepapelMP[{#SNMPVALUE}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                    </graph_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>Descoberta LLD Nivel de Papel Tray 1</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.2.1.43.8.2.1.18.1]</snmp_oid>
+                    <key>prtInputDescriptionTray1</key>
+                    <delay>3600</delay>
+                    <filter>
+                        <conditions>
+                            <condition>
+                                <macro>{#SNMPVALUE}</macro>
+                                <value>^Tray 1$</value>
+                                <formulaid>A</formulaid>
+                            </condition>
+                        </conditions>
+                    </filter>
+                    <lifetime>1d</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>Nivel de Papel na Bandeja $1 (Porcentagem)</name>
+                            <type>CALCULATED</type>
+                            <key>niveldepapelTray1[{#SNMPVALUE}]</key>
+                            <delay>900</delay>
+                            <history>7d</history>
+                            <value_type>FLOAT</value_type>
+                            <units>%</units>
+                            <params>100*last(&quot;prtInputCurrentLevelTray1[{#SNMPVALUE}]&quot;)/last(&quot;prtInputMaxCapacityTray1[{#SNMPVALUE}]&quot;)</params>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes da Bandeja da Impressora</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}=1</expression>
+                                    <name>Abastecimento de Papel A4 Necessario em {ITEM.VALUE} Na {HOSTNAME}</name>
+                                    <priority>HIGH</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=2</expression>
+                                    <name>Abastecimento de Papel A4 Necessario em {ITEM.VALUE} Na {HOSTNAME}</name>
+                                    <priority>WARNING</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=3</expression>
+                                    <name>Nivel de Papel A4 Acabando Abaixo de {ITEM.VALUE}  {HOSTNAME}</name>
+                                    <priority>INFO</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=4</expression>
+                                    <name>Nivel de Papel A4 Acabando Abaixo de {ITEM.VALUE}  {HOSTNAME}</name>
+                                    <priority>INFO</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Nivel de Papel da Bandeja $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.8.2.1.10.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtInputCurrentLevelTray1[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>90d</trends>
+                            <value_type>FLOAT</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes da Bandeja da Impressora</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Descricao da Bandeja Tray 1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.8.2.1.18.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtInputDescription[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>7d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes da Bandeja da Impressora</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Maxima Capacidade da Bandeja $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.8.2.1.9.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtInputMaxCapacityTray1[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>7d</history>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes da Bandeja da Impressora</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                    <graph_prototypes>
+                        <graph_prototype>
+                            <name>10- Nivel de Papel Na Bandeja {#SNMPVALUE}</name>
+                            <graph_items>
+                                <graph_item>
+                                    <drawtype>FILLED_REGION</drawtype>
+                                    <color>FFFFFF</color>
+                                    <item>
+                                        <host>Template SNMP Impressora MPS5501b - HEAA</host>
+                                        <key>niveldepapelTray1[{#SNMPVALUE}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                    </graph_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>Descoberta LLD Nivel de Papel Tray 2</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.2.1.43.8.2.1.18.1]</snmp_oid>
+                    <key>prtInputDescriptionTray2</key>
+                    <delay>3600</delay>
+                    <filter>
+                        <conditions>
+                            <condition>
+                                <macro>{#SNMPVALUE}</macro>
+                                <value>^Tray 2$</value>
+                                <formulaid>A</formulaid>
+                            </condition>
+                        </conditions>
+                    </filter>
+                    <lifetime>1d</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>Nivel de Papel na Bandeja $1 (Porcentagem)</name>
+                            <type>CALCULATED</type>
+                            <key>niveldepapelTray2[{#SNMPVALUE}]</key>
+                            <delay>900</delay>
+                            <history>7d</history>
+                            <value_type>FLOAT</value_type>
+                            <units>%</units>
+                            <params>100*last(&quot;prtInputCurrentLevelTray2[{#SNMPVALUE}]&quot;)/last(&quot;prtInputMaxCapacityTray2[{#SNMPVALUE}]&quot;)</params>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes da Bandeja 2 da Impressora</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}=1</expression>
+                                    <name>Abastecimento de Papel A4 Necessario em {ITEM.VALUE} Na {HOSTNAME}</name>
+                                    <priority>HIGH</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=2</expression>
+                                    <name>Nivel de Papel A4 Acabando Abaixo de {ITEM.VALUE}  Na {HOSTNAME}</name>
+                                    <priority>WARNING</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=3</expression>
+                                    <name>Nivel de Papel A4 Acabando Abaixo de {ITEM.VALUE}  Na {HOSTNAME}</name>
+                                    <priority>INFO</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=4</expression>
+                                    <name>Nivel de Papel A4 Acabando Abaixo de {ITEM.VALUE}  Na {HOSTNAME}</name>
+                                    <priority>INFO</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Nivel de Papel da Bandeja $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.8.2.1.10.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtInputCurrentLevelTray2[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>7d</history>
+                            <value_type>FLOAT</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes da Bandeja 2 da Impressora</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Descricao da Bandeja 2</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.8.2.1.18.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtInputDescriptionTray1[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes da Bandeja 2 da Impressora</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Maxima Capacidade da Bandeja $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.8.2.1.9.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtInputMaxCapacityTray2[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes da Bandeja 2 da Impressora</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                    <graph_prototypes>
+                        <graph_prototype>
+                            <name>11- Nivel de Papel Na Bandeja {#SNMPVALUE}</name>
+                            <graph_items>
+                                <graph_item>
+                                    <drawtype>FILLED_REGION</drawtype>
+                                    <color>FFFFFF</color>
+                                    <item>
+                                        <host>Template SNMP Impressora MPS5501b - HEAA</host>
+                                        <key>niveldepapelTray2[{#SNMPVALUE}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                    </graph_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>Descoberta LLD Fusor</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.2.1.43.11.1.1.6.1]</snmp_oid>
+                    <key>prtMarkerFusorDescription</key>
+                    <delay>3600</delay>
+                    <filter>
+                        <conditions>
+                            <condition>
+                                <macro>{#SNMPVALUE}</macro>
+                                <value>Fuser</value>
+                                <formulaid>A</formulaid>
+                            </condition>
+                        </conditions>
+                    </filter>
+                    <lifetime>1d</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>Maxima Capacidade do Fusor $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.11.1.1.8.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerFusorCapacity[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>90d</trends>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Fusor da Impressora</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Descricao do Fusor</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.11.1.1.6.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerFusorDescription[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Fusor da Impressora</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Nivel de Capacidade do Fusor</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.11.1.1.9.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerFusorLevel[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>90d</trends>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Fusor da Impressora</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Tempo de Vida do Fusor ( Impressoes)</name>
+                            <type>CALCULATED</type>
+                            <key>vidafusorImpressoes[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>90d</trends>
+                            <params>last(&quot;prtMarkerFusorCapacity[{#SNMPVALUE}]&quot;)-last(&quot;prtMarkerFusorLevel[{#SNMPVALUE}]&quot;)</params>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Fusor da Impressora</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Tempo de Vida Restante no Fusor</name>
+                            <type>CALCULATED</type>
+                            <key>vidafusor[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>90d</trends>
+                            <units>%</units>
+                            <params>100*last(&quot;prtMarkerFusorLevel[{#SNMPVALUE}]&quot;)/last(&quot;prtMarkerFusorCapacity[{#SNMPVALUE}]&quot;)</params>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Fusor da Impressora</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}&lt;=2</expression>
+                                    <name>Vida Útil do Fusor em {ITEM.VALUE} Troca Necessária na {HOSTNAME}</name>
+                                    <priority>WARNING</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=5</expression>
+                                    <name>Vida Útil do Fusor em {ITEM.VALUE} Troca Necessária na {HOSTNAME}</name>
+                                    <priority>INFO</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                    <graph_prototypes>
+                        <graph_prototype>
+                            <name>09- Tempo de Vida do {#SNMPVALUE}</name>
+                            <graph_items>
+                                <graph_item>
+                                    <drawtype>FILLED_REGION</drawtype>
+                                    <color>1A7C11</color>
+                                    <item>
+                                        <host>Template SNMP Impressora MPS5501b - HEAA</host>
+                                        <key>vidafusor[{#SNMPVALUE}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                    </graph_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>Descoberta LLD Unit Toner</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.2.1.43.11.1.1.6.1]</snmp_oid>
+                    <key>prtMarkerSuppliesDescription</key>
+                    <delay>3600</delay>
+                    <filter>
+                        <conditions>
+                            <condition>
+                                <macro>{#SNMPVALUE}</macro>
+                                <value>^Cyan Imaging Unit</value>
+                                <formulaid>A</formulaid>
+                            </condition>
+                            <condition>
+                                <macro>{#SNMPVALUE}</macro>
+                                <value>^Black Imaging Unit</value>
+                                <formulaid>B</formulaid>
+                            </condition>
+                            <condition>
+                                <macro>{#SNMPVALUE}</macro>
+                                <value>^Yellow Imaging Unit</value>
+                                <formulaid>C</formulaid>
+                            </condition>
+                            <condition>
+                                <macro>{#SNMPVALUE}</macro>
+                                <value>^Magenta Imaging Unit</value>
+                                <formulaid>D</formulaid>
+                            </condition>
+                        </conditions>
+                    </filter>
+                    <lifetime>1d</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>Tipo de Classe da Unidade $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.11.1.1.4.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerSuppliesClassUnit[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>7d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes da Classe da Unidade</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Descricao da Unidade</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.11.1.1.6.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerSuppliesDescription[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes da Unidade</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{diff(0)}&gt;0</expression>
+                                    <name>A Unidade {ITEM.VALUE} Foi alterado na Impressora {HOSTNAME}</name>
+                                    <priority>INFO</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Nivel de Capacidade da Unidade $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.11.1.1.9.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerSuppliesLevel[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>90d</trends>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes de Nivel da unidade</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Maxima Capacidade da Unidade $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.11.1.1.8.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerSuppliesMaxCapacity[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>90d</trends>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes da Capacidade Maxima da Unidade</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Tipo de Suprimentos da Unidade $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.11.1.1.5.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerSuppliesType[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>7d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Tipo da Unidade</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Nivel da Unidade $1 ( Porcentagem)</name>
+                            <type>CALCULATED</type>
+                            <key>TempodeVidautilUnit[{#SNMPVALUE}]</key>
+                            <delay>900</delay>
+                            <history>60d</history>
+                            <trends>90d</trends>
+                            <units>%</units>
+                            <params>100*last(&quot;prtMarkerSuppliesLevel[{#SNMPVALUE}]&quot;)/last(&quot;prtMarkerSuppliesMaxCapacity[{#SNMPVALUE}]&quot;)</params>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes de Vida Util da Unidade</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}&lt;7</expression>
+                                    <name>Tempo de Vida {#SNMPVALUE} em {ITEM.VALUE}</name>
+                                    <priority>WARNING</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>Descoberta LLD Toner Black</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.2.1.43.11.1.1.6.1]</snmp_oid>
+                    <key>prtMarkerSuppliesDescriptionBlack</key>
+                    <delay>3600</delay>
+                    <filter>
+                        <conditions>
+                            <condition>
+                                <macro>{#SNMPVALUE}</macro>
+                                <value>^Black Toner</value>
+                                <formulaid>A</formulaid>
+                            </condition>
+                        </conditions>
+                    </filter>
+                    <lifetime>1d</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>Tipo de Tonalidade Relacionada ao $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.12.1.1.5.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerColorantTonalityBlack[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Toner Black</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Tipo de Cor Relacionada ao $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.12.1.1.4.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerColorantValueBlack[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Toner Black</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Tipo de Classe do  $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.11.1.1.4.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerSuppliesClassBlack[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>7d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Toner Black</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Descricao do Toner Black</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.11.1.1.6.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerSuppliesDescriptionBlack[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>7d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Toner Black</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{diff(0)}&gt;0</expression>
+                                    <name>O Toner {ITEM.VALUE} Foi alterado na {HOSTNAME}</name>
+                                    <priority>INFO</priority>
+                                    <manual_close>YES</manual_close>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Nivel Capacidade de Suprimentos do  $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.11.1.1.9.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerSuppliesLevelBlack[{#SNMPVALUE}]</key>
+                            <delay>300</delay>
+                            <history>7d</history>
+                            <trends>90d</trends>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Toner Black</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Maxima Capacidade de Suprimentos do $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.11.1.1.8.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerSuppliesMaxCapacityBlack[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>7d</history>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Toner Black</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Tipo de Suprimentos do $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.12.1.1.5.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerSuppliesTypeBlack[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Toner Black</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Nivel do $1 ( Porcentagem)</name>
+                            <type>CALCULATED</type>
+                            <key>totaltonerBlack[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>90d</trends>
+                            <units>%</units>
+                            <params>100*last(&quot;prtMarkerSuppliesLevelBlack[{#SNMPVALUE}]&quot;)/last(&quot;prtMarkerSuppliesMaxCapacityBlack[{#SNMPVALUE}]&quot;)</params>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Toner Black</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}&lt;3</expression>
+                                    <name>Nível do {#SNMPVALUE} abaixo de 5 %</name>
+                                    <priority>AVERAGE</priority>
+                                    <manual_close>YES</manual_close>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}&lt;7 and&#13;
+{last()}&gt;5</expression>
+                                    <name>Nível do {#SNMPVALUE} em {ITEM.VALUE}</name>
+                                    <status>DISABLED</status>
+                                    <discover>NO_DISCOVER</discover>
+                                    <priority>WARNING</priority>
+                                    <manual_close>YES</manual_close>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=5</expression>
+                                    <name>Nível do {#SNMPVALUE} em {ITEM.VALUE}</name>
+                                    <priority>WARNING</priority>
+                                    <manual_close>YES</manual_close>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=10</expression>
+                                    <name>Nível do {#SNMPVALUE} em {ITEM.VALUE}</name>
+                                    <priority>WARNING</priority>
+                                    <manual_close>YES</manual_close>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=15</expression>
+                                    <name>Nível do {#SNMPVALUE} em {ITEM.VALUE}</name>
+                                    <status>DISABLED</status>
+                                    <discover>NO_DISCOVER</discover>
+                                    <priority>INFO</priority>
+                                    <manual_close>YES</manual_close>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=20</expression>
+                                    <name>Nível do {#SNMPVALUE} em {ITEM.VALUE}</name>
+                                    <status>DISABLED</status>
+                                    <discover>NO_DISCOVER</discover>
+                                    <priority>INFO</priority>
+                                    <manual_close>YES</manual_close>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=0</expression>
+                                    <name>Troca Necessária do {#SNMPVALUE} em {ITEM.VALUE}</name>
+                                    <priority>HIGH</priority>
+                                    <manual_close>YES</manual_close>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=100</expression>
+                                    <name>Um Novo {#SNMPVALUE} Foi instalado</name>
+                                    <priority>INFO</priority>
+                                    <manual_close>YES</manual_close>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                    <graph_prototypes>
+                        <graph_prototype>
+                            <name>13- Nivel do {#SNMPVALUE}</name>
+                            <graph_items>
+                                <graph_item>
+                                    <drawtype>FILLED_REGION</drawtype>
+                                    <color>000000</color>
+                                    <item>
+                                        <host>Template SNMP Impressora MPS5501b - HEAA</host>
+                                        <key>totaltonerBlack[{#SNMPVALUE}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                    </graph_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>Descoberta LLD Toner Cyan</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.2.1.43.11.1.1.6.1]</snmp_oid>
+                    <key>prtMarkerSuppliesDescriptionCyan</key>
+                    <delay>3600</delay>
+                    <filter>
+                        <conditions>
+                            <condition>
+                                <macro>{#SNMPVALUE}</macro>
+                                <value>^Cyan Toner Cartridge</value>
+                                <formulaid>A</formulaid>
+                            </condition>
+                        </conditions>
+                    </filter>
+                    <lifetime>1d</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>Tipo de Tonalidade Relacionada ao $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.12.1.1.5.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerColorantTonalityCyan[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Toner Cyan</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Tipo de Cor Relacionada ao $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.12.1.1.4.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerColorantValueCyan[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Toner Cyan</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Tipo de Classe do  $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.11.1.1.4.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerSuppliesClassCyan[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Toner Cyan</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Descricao do Toner Cyan</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.11.1.1.6.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerSuppliesDescriptionCyan[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>7d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Toner Cyan</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{diff(0)}&gt;0</expression>
+                                    <name>O Toner {ITEM.VALUE} Foi alterado na Impressora {HOSTNAME}</name>
+                                    <priority>INFO</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Nivel Capacidade de Suprimentos do  $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.11.1.1.9.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerSuppliesLevelCyan[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>90d</trends>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Toner Cyan</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Maxima Capacidade de Suprimentos do $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.11.1.1.8.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerSuppliesMaxCapacityCyan[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>90d</trends>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Toner Cyan</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Tipo de Suprimentos do $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.12.1.1.5.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerSuppliesTypeCyan[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Toner Cyan</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Nivel do $1 ( Porcentagem)</name>
+                            <type>CALCULATED</type>
+                            <key>totaltonerCyan[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>90d</trends>
+                            <units>%</units>
+                            <params>100*last(&quot;prtMarkerSuppliesLevelCyan[{#SNMPVALUE}]&quot;)/last(&quot;prtMarkerSuppliesMaxCapacityCyan[{#SNMPVALUE}]&quot;)</params>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Toner Cyan</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}=2</expression>
+                                    <name>Nivel do Toner {#SNMPVALUE} em {ITEM.VALUE}</name>
+                                    <priority>WARNING</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=4</expression>
+                                    <name>Nivel do Toner {#SNMPVALUE} em {ITEM.VALUE}</name>
+                                    <priority>INFO</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=1</expression>
+                                    <name>Nível do Toner {#SNMPVALUE} em {ITEM.VALUE}</name>
+                                    <priority>HIGH</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=3</expression>
+                                    <name>Nível do Toner {#SNMPVALUE} em {ITEM.VALUE}</name>
+                                    <priority>INFO</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=5</expression>
+                                    <name>Nível do Toner {#SNMPVALUE} em {ITEM.VALUE}</name>
+                                    <priority>INFO</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=0</expression>
+                                    <name>Troca Necessária do {#SNMPVALUE} em {ITEM.VALUE}</name>
+                                    <priority>HIGH</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                    <graph_prototypes>
+                        <graph_prototype>
+                            <name>14- Nivel do {#SNMPVALUE}</name>
+                            <graph_items>
+                                <graph_item>
+                                    <drawtype>FILLED_REGION</drawtype>
+                                    <color>00FFFF</color>
+                                    <item>
+                                        <host>Template SNMP Impressora MPS5501b - HEAA</host>
+                                        <key>totaltonerCyan[{#SNMPVALUE}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                    </graph_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>Descoberta LLD Toner Magenta</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.2.1.43.11.1.1.6.1]</snmp_oid>
+                    <key>prtMarkerSuppliesDescriptionMagenta</key>
+                    <delay>3600</delay>
+                    <filter>
+                        <conditions>
+                            <condition>
+                                <macro>{#SNMPVALUE}</macro>
+                                <value>^Magenta Toner Cartridge</value>
+                                <formulaid>A</formulaid>
+                            </condition>
+                        </conditions>
+                    </filter>
+                    <lifetime>1d</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>Tipo de Tonalidade Relacionada ao $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.12.1.1.5.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerColorantTonalityMagenta[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Toner Magenta</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Tipo de Cor Relacionada ao $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.12.1.1.4.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerColorantValueMagenta[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Toner Magenta</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Tipo de Classe do  $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.11.1.1.4.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerSuppliesClassMagenta[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Toner Magenta</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Descricao do Toner Magenta</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.11.1.1.6.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerSuppliesDescriptionMagenta[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Toner Magenta</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{diff(0)}&gt;0</expression>
+                                    <name>O Toner {ITEM.VALUE} Foi alterado na Impressora {HOSTNAME}</name>
+                                    <priority>INFO</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Nivel Capacidade de Suprimentos do  $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.11.1.1.9.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerSuppliesLevelMagenta[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>90d</trends>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Toner Magenta</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Maxima Capacidade de Suprimentos do $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.11.1.1.8.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerSuppliesMaxCapacityMagenta[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>90d</trends>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Toner Magenta</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Tipo de Suprimentos do $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.12.1.1.5.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerSuppliesTypeMagenta[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Toner Magenta</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Nivel do $1 ( Porcentagem)</name>
+                            <type>CALCULATED</type>
+                            <key>totaltonerMagenta[{#SNMPVALUE}]</key>
+                            <delay>900</delay>
+                            <history>60d</history>
+                            <trends>90d</trends>
+                            <units>%</units>
+                            <params>100*last(&quot;prtMarkerSuppliesLevelMagenta[{#SNMPVALUE}]&quot;)/last(&quot;prtMarkerSuppliesMaxCapacityMagenta[{#SNMPVALUE}]&quot;)</params>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Toner Magenta</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}&lt;1</expression>
+                                    <name>Nivel do Toner {#SNMPVALUE} em {ITEM.VALUE}</name>
+                                    <priority>HIGH</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=2</expression>
+                                    <name>Nivel do Toner {#SNMPVALUE} em {ITEM.VALUE}</name>
+                                    <priority>WARNING</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=3</expression>
+                                    <name>Nivel do Toner {#SNMPVALUE} em {ITEM.VALUE}</name>
+                                    <priority>INFO</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=4</expression>
+                                    <name>Nivel do Toner {#SNMPVALUE} em {ITEM.VALUE}</name>
+                                    <priority>INFO</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=5</expression>
+                                    <name>Nivel do Toner {#SNMPVALUE} em {ITEM.VALUE}</name>
+                                    <priority>INFO</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=0</expression>
+                                    <name>Troca Necessaria do {#SNMPVALUE} em {ITEM.VALUE}</name>
+                                    <priority>HIGH</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                    <graph_prototypes>
+                        <graph_prototype>
+                            <name>15- Nivel do {#SNMPVALUE}</name>
+                            <graph_items>
+                                <graph_item>
+                                    <drawtype>FILLED_REGION</drawtype>
+                                    <color>FF00FF</color>
+                                    <item>
+                                        <host>Template SNMP Impressora MPS5501b - HEAA</host>
+                                        <key>totaltonerMagenta[{#SNMPVALUE}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                    </graph_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>Descoberta LLD Unidade de Transferencia</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.2.1.43.11.1.1.6.1]</snmp_oid>
+                    <key>prtMarkerSuppliesDescriptionTransfer</key>
+                    <delay>3600</delay>
+                    <filter>
+                        <conditions>
+                            <condition>
+                                <macro>{#SNMPVALUE}</macro>
+                                <value>^Transfer</value>
+                                <formulaid>A</formulaid>
+                            </condition>
+                        </conditions>
+                    </filter>
+                    <lifetime>1d</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>Descricao da Unidade de Transferencia</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.11.1.1.6.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerTransferDescription[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes da Unidade de Transferencia</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Nivel de Capacidade da Unidade de Transferencia ( $1 )</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.11.1.1.9.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerTransferLevel[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes da Unidade de Transferencia</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Maxima Capacidade da Unidade de Transferencia ( $1 )</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.11.1.1.8.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerTransferMaxCapacity[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes da Unidade de Transferencia</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Tempo de Vida da Unidade de Transferencia ( Impressoes) ( $1 )</name>
+                            <type>CALCULATED</type>
+                            <key>vidaTransferImpressoesRealizadas[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>7d</history>
+                            <params>last(&quot;prtMarkerTransferMaxCapacity[{#SNMPVALUE}]&quot;)-last(&quot;prtMarkerTransferLevel[{#SNMPVALUE}]&quot;)</params>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes da Unidade de Transferencia</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Tempo de Vida Restante na Unidade de Transferencia ( $1 )</name>
+                            <type>CALCULATED</type>
+                            <key>vidaTransferImpressoes[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>7d</history>
+                            <units>%</units>
+                            <params>100*last(&quot;prtMarkerTransferLevel[{#SNMPVALUE}]&quot;)/last(&quot;prtMarkerTransferMaxCapacity[{#SNMPVALUE}]&quot;)</params>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes da Unidade de Transferencia</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}&lt;5</expression>
+                                    <name>Troca da Unidade de Transferencia Necessaria na Impressora {HOSTNAME}</name>
+                                    <priority>INFO</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>Descoberta LLD Toner Yellow</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.2.1.43.11.1.1.6.1]</snmp_oid>
+                    <key>prtMarkerSuppliesDescriptionYellow</key>
+                    <delay>3600</delay>
+                    <filter>
+                        <conditions>
+                            <condition>
+                                <macro>{#SNMPVALUE}</macro>
+                                <value>^Yellow Toner Cartridge</value>
+                                <formulaid>A</formulaid>
+                            </condition>
+                        </conditions>
+                    </filter>
+                    <lifetime>1d</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>Tipo de Tonalidade Relacionada ao $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.12.1.1.5.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerColorantTonalityYellow[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Toner Yellow</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Tipo de Cor Relacionada ao $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.12.1.1.4.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerColorantValueYellow[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Toner Yellow</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Tipo de Classe do  $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.11.1.1.4.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerSuppliesClassYellow[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Toner Yellow</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Descricao do Toner Yellow</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.11.1.1.6.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerSuppliesDescriptionYellow[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Toner Yellow</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{diff(0)}&gt;0</expression>
+                                    <name>O Toner {ITEM.VALUE} Foi alterado na Impressora {HOSTNAME}</name>
+                                    <priority>INFO</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Nivel Capacidade de Suprimentos do  $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.11.1.1.9.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerSuppliesLevelYellow[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>90d</trends>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Toner Yellow</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Maxima Capacidade de Suprimentos do $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.11.1.1.8.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerSuppliesMaxCapacityYellow[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>90d</trends>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Toner Yellow</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Tipo de Suprimentos do $1</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.12.1.1.5.1.{#SNMPINDEX}</snmp_oid>
+                            <key>prtMarkerSuppliesTypeYellow[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Toner Yellow</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Nivel do $1 ( Porcentagem)</name>
+                            <type>CALCULATED</type>
+                            <key>totaltonerYellow[{#SNMPVALUE}]</key>
+                            <delay>900</delay>
+                            <history>60d</history>
+                            <trends>90d</trends>
+                            <units>%</units>
+                            <params>100*last(&quot;prtMarkerSuppliesLevelYellow[{#SNMPVALUE}]&quot;)/last(&quot;prtMarkerSuppliesMaxCapacityYellow[{#SNMPVALUE}]&quot;)</params>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Toner Yellow</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}&lt;1</expression>
+                                    <name>Nivel do Toner {#SNMPVALUE} em {ITEM.VALUE}</name>
+                                    <priority>HIGH</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=2</expression>
+                                    <name>Nivel do Toner {#SNMPVALUE} em {ITEM.VALUE}</name>
+                                    <priority>WARNING</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=3</expression>
+                                    <name>Nivel do Toner {#SNMPVALUE} em {ITEM.VALUE}</name>
+                                    <priority>INFO</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=4</expression>
+                                    <name>Nivel do Toner {#SNMPVALUE} em {ITEM.VALUE}</name>
+                                    <priority>INFO</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=5</expression>
+                                    <name>Nivel do Toner {#SNMPVALUE} em {ITEM.VALUE}</name>
+                                    <priority>INFO</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=0</expression>
+                                    <name>Troca Necessaria do {#SNMPVALUE} em {ITEM.VALUE}</name>
+                                    <priority>HIGH</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>A {HOST.NAME} está Offline</name>
+                                            <expression>{Template SNMP Impressora MPS5501b - HEAA:icmpping.max(#3)}=0</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                    <graph_prototypes>
+                        <graph_prototype>
+                            <name>16- Nivel do {#SNMPVALUE}</name>
+                            <graph_items>
+                                <graph_item>
+                                    <drawtype>FILLED_REGION</drawtype>
+                                    <color>FFFF00</color>
+                                    <item>
+                                        <host>Template SNMP Impressora MPS5501b - HEAA</host>
+                                        <key>totaltonerYellow[{#SNMPVALUE}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                    </graph_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>Descoberta LLD Informacoes do Hardware</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},.1.3.6.1.2.1.1.1]</snmp_oid>
+                    <key>sysDescr</key>
+                    <delay>3600</delay>
+                    <lifetime>1d</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>Numero de Serie do Equipamento</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.43.5.1.1.17.{#SNMPINDEX}</snmp_oid>
+                            <key>prtGeneralSerialNumber[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Equipamento</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Informacao de Contato do Equipamento</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.1.4.{#SNMPINDEX}</snmp_oid>
+                            <key>sysContact[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Equipamento</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Descricao do Equipamento</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.1.1.{#SNMPINDEX}</snmp_oid>
+                            <key>sysDescr[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Equipamento</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Localizacao do Equipamento</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.1.6.{#SNMPINDEX}</snmp_oid>
+                            <key>sysLocation[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Equipamento</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Hostname do Equipamento</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.1.5.{#SNMPINDEX}</snmp_oid>
+                            <key>sysName[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Equipamento</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Quantidade de Servico</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.1.7.{#SNMPINDEX}</snmp_oid>
+                            <key>sysServices[{#SNMPVALUE}]</key>
+                            <delay>600</delay>
+                            <history>60d</history>
+                            <trends>90d</trends>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>Informacoes do Equipamento</name>
+                                </application_prototype>
+                            </application_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+            </discovery_rules>
+            <macros>
+                <macro>
+                    <macro>{$CUSTO.FOLHA}</macro>
+                    <value>0.046</value>
+                    <description>Custo de cada folha impressa</description>
+                </macro>
+                <macro>
+                    <macro>{$CUSTO.FOLHA.UNIVERSODIGI}</macro>
+                    <value>0.05</value>
+                    <description>Custo de cada folha impressa pago à Universo Digital</description>
+                </macro>
+                <macro>
+                    <macro>{$CUSTO.PACOTE}</macro>
+                    <value>25</value>
+                    <description>Custo de um Pacote de Papel Sulfite com 500 Folhas</description>
+                </macro>
+            </macros>
+        </template>
+    </templates>
+    <graphs>
+        <graph>
+            <name>01- Disponibilidade</name>
+            <graph_items>
+                <graph_item>
+                    <drawtype>FILLED_REGION</drawtype>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>Template SNMP Impressora MPS5501b - HEAA</host>
+                        <key>icmpping</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>02- Latencia</name>
+            <graph_items>
+                <graph_item>
+                    <drawtype>FILLED_REGION</drawtype>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>Template SNMP Impressora MPS5501b - HEAA</host>
+                        <key>icmppingsec</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>03- Perda de Pacote ( Porcentagem )</name>
+            <graph_items>
+                <graph_item>
+                    <drawtype>FILLED_REGION</drawtype>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>Template SNMP Impressora MPS5501b - HEAA</host>
+                        <key>icmppingloss</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>04- Tempo Ligado do Equipamento</name>
+            <graph_items>
+                <graph_item>
+                    <drawtype>FILLED_REGION</drawtype>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>Template SNMP Impressora MPS5501b - HEAA</host>
+                        <key>sysUpTimeInstance</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>05- Paginas Impressas Total</name>
+            <graph_items>
+                <graph_item>
+                    <drawtype>FILLED_REGION</drawtype>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>Template SNMP Impressora MPS5501b - HEAA</host>
+                        <key>prtMarkerLifeCount.1.1</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>06- Paginas Impressas Por Dia</name>
+            <graph_items>
+                <graph_item>
+                    <drawtype>FILLED_REGION</drawtype>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>Template SNMP Impressora MPS5501b - HEAA</host>
+                        <key>impressoes_dia</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>07- Paginas Impressas Por Semana</name>
+            <graph_items>
+                <graph_item>
+                    <drawtype>FILLED_REGION</drawtype>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>Template SNMP Impressora MPS5501b - HEAA</host>
+                        <key>impressoes_semana</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>08- Paginas Impressas Por Mes</name>
+            <graph_items>
+                <graph_item>
+                    <drawtype>FILLED_REGION</drawtype>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>Template SNMP Impressora MPS5501b - HEAA</host>
+                        <key>impressoes_mes</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+    </graphs>
+    <value_maps>
+        <value_map>
+            <name>SNMP interface status (ifAdminStatus)</name>
+            <mappings>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>up</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>down</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>testing</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+    </value_maps>
+</zabbix_export>
